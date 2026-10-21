@@ -32,29 +32,40 @@ because they contain no Qt meta-object, UI form, or Qt resource sources.
 ## macOS development flow
 
 ```bash
-tools/cmake/macos-universal/bin/cmake --preset macos-debug
-tools/cmake/macos-universal/bin/cmake --build --preset macos-debug
-tools/cmake/macos-universal/bin/cmake --install out/debug
+cmake --preset macos-debug
+cmake --build --preset macos-debug
+cmake --install out/debug
 ```
 
-## CEF dependency bootstrap
+This is also the clean-clone workflow. The first configure restores and
+checksum-verifies missing Ninja, Qt Base, and CEF packages. Later configures
+reuse the local tools, SDKs, and download cache. No global Ninja/Qt/CEF
+installation or separate bootstrap command is required. A C++ compiler and
+CMake 3.25+ are host prerequisites.
 
-CEF is not downloaded during normal project configuration. The maintained
-workspace currently contains the pinned minimal SDK for macOS ARM64 and Windows
-x64. On a clean workstation or after deleting a staged SDK, restore the host
-SDK explicitly before configuring:
+## Dependency bootstrap
+
+Missing Ninja, Qt, and CEF packages are downloaded during normal project
+configuration. The scripts below remain available for explicit maintenance and
+diagnostics:
 
 ```bash
-tools/cmake/macos-universal/bin/cmake -P tools/fetch_cef.cmake
+cmake -P tools/fetch_ninja.cmake
+cmake -P tools/fetch_qt.cmake
+cmake -P tools/fetch_cef.cmake
 ```
 
 On Windows:
 
 ```powershell
-tools\cmake\windows-x64\bin\cmake.exe `
+cmake `
   -DAGENTIM_CEF_PLATFORM=windows-x64 `
   -P tools\fetch_cef.cmake
 ```
+
+Set `AGENTIM_AUTO_FETCH_DEPENDENCIES=OFF` only for an intentionally offline or
+pre-provisioned build. In that mode, `AGENTIM_QT_ROOT` and `AGENTIM_CEF_ROOT`
+must identify complete SDKs.
 
 The script verifies the official versioned SHA-1 sidecar and stores the vendor
 archive, sidecar, and extracted SDK together under
@@ -93,10 +104,10 @@ nested native event loop.
 The Web application can also be built independently of the native shell:
 
 ```bash
-tools/cmake/macos-universal/bin/cmake \
+cmake \
   -S web_apps/workbench \
   -B out/web-workbench
-tools/cmake/macos-universal/bin/cmake \
+cmake \
   --build out/web-workbench
 ```
 

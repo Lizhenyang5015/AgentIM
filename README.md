@@ -44,20 +44,19 @@ AgentIM/
 The project maintains fixed-version Qt binary SDKs under
 `third_party/qt/<platform-architecture>` and fixed-version CEF minimal SDKs under
 `third_party/cef/<platform-architecture>/<version>/sdk`. The root CMake
-configuration selects the matching SDKs for the current platform. On a clean
-workspace, restore the CEF SDK before the first configure:
+configuration selects the matching SDKs for the current platform. From a clean
+clone, run:
 
 ```bash
-tools/cmake/macos-universal/bin/cmake -P tools/fetch_cef.cmake
+cmake --preset macos-debug
+cmake --build --preset macos-debug
+cmake --install out/debug
 ```
 
-Then run:
-
-```bash
-tools/cmake/macos-universal/bin/cmake --preset macos-debug
-tools/cmake/macos-universal/bin/cmake --build --preset macos-debug
-tools/cmake/macos-universal/bin/cmake --install out/debug
-```
+The first configure automatically downloads and checksum-verifies the pinned
+Ninja, Qt Base, and CEF packages when they are missing. Developers need only a
+CMake 3.25+ installation and the platform C++ compiler; no separate dependency
+preparation command is part of the normal workflow.
 
 Use `windows-debug` on Windows. The application starts in `main()` at
 `src/app/src/main.cpp`, initializes CEF and its packaged Web resource scheme, and

@@ -11,9 +11,19 @@ set(AGENTIM_CEF_BASE_URL
     CACHE STRING "CEF binary distribution base URL or internal mirror")
 
 if(NOT AGENTIM_CEF_PLATFORM)
-    if(APPLE AND CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "arm64")
+    set(_agentim_cef_host_processor "${CMAKE_HOST_SYSTEM_PROCESSOR}")
+    if(APPLE AND NOT _agentim_cef_host_processor)
+        execute_process(
+            COMMAND uname -m
+            OUTPUT_VARIABLE _agentim_cef_host_processor
+            OUTPUT_STRIP_TRAILING_WHITESPACE)
+    elseif(WIN32 AND NOT _agentim_cef_host_processor)
+        set(_agentim_cef_host_processor "$ENV{PROCESSOR_ARCHITECTURE}")
+    endif()
+
+    if(APPLE AND _agentim_cef_host_processor STREQUAL "arm64")
         set(AGENTIM_CEF_PLATFORM "macos-arm64")
-    elseif(WIN32 AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "^(AMD64|amd64|x86_64)$")
+    elseif(WIN32 AND _agentim_cef_host_processor MATCHES "^(AMD64|amd64|x86_64)$")
         set(AGENTIM_CEF_PLATFORM "windows-x64")
     else()
         message(FATAL_ERROR
@@ -35,7 +45,11 @@ endif()
 cmake_path(GET CMAKE_CURRENT_LIST_DIR PARENT_PATH _agentim_project_root)
 set(_agentim_cef_platform_root
     "${_agentim_project_root}/third_party/cef/${AGENTIM_CEF_PLATFORM}/${AGENTIM_CEF_VERSION}")
-set(_agentim_cef_sdk_root "${_agentim_cef_platform_root}/sdk")
+if(AGENTIM_CEF_ROOT)
+    set(_agentim_cef_sdk_root "${AGENTIM_CEF_ROOT}")
+else()
+    set(_agentim_cef_sdk_root "${_agentim_cef_platform_root}/sdk")
+endif()
 set(_agentim_cef_distribution
     "cef_binary_${AGENTIM_CEF_VERSION}_${_agentim_cef_archive_platform}_minimal")
 set(_agentim_cef_archive "${_agentim_cef_distribution}.tar.bz2")

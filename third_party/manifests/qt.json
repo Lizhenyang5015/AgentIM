@@ -7,11 +7,23 @@
   "platforms": {
     "macos-arm64": {
       "root": "third_party/qt/macos-arm64/6.10.3/macos",
-      "required_paths": ["include", "lib", "plugins"]
+      "required_paths": ["include", "lib", "plugins"],
+      "acquisition": {
+        "repository": "https://download.qt.io/online/qtsdkrepository/mac_x64/desktop/qt6_6103/qt6_6103",
+        "package": "qt.qt6.6103.clang_64",
+        "archive": "6.10.3-0-202603310405qtbase-MacOS-MacOS_15-Clang-MacOS-MacOS_15-X86_64-ARM64.7z",
+        "sha1": "6b2ebb5f35c7d3b533a0d7014f66bd1107858074"
+      }
     },
     "windows-x64": {
       "root": "third_party/qt/windows-x64/6.10.3/msvc2022_64",
-      "required_paths": ["include", "lib", "plugins"]
+      "required_paths": ["include", "lib", "plugins"],
+      "acquisition": {
+        "repository": "https://download.qt.io/online/qtsdkrepository/windows_x86/desktop/qt6_6103/qt6_6103",
+        "package": "qt.qt6.6103.win64_msvc2022_64",
+        "archive": "6.10.3-0-202603310407qtbase-Windows-Windows_11_24H2-MSVC2022-Windows-Windows_11_24H2-X86_64.7z",
+        "sha1": "08bd6fea980b53485877f5048c725ca334c19130"
+      }
     }
   },
   "runtime": {

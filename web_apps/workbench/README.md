@@ -49,20 +49,20 @@ artifact; it must not copy or serve files directly from `src/`.
 From the AgentIM repository root on macOS:
 
 ```bash
-tools/cmake/macos-universal/bin/cmake \
+cmake \
   -S web_apps/workbench \
   -B out/web-workbench
-tools/cmake/macos-universal/bin/cmake \
+cmake \
   --build out/web-workbench
 ```
 
 On Windows:
 
 ```powershell
-tools\cmake\windows-x64\bin\cmake.exe `
+cmake `
   -S web_apps\workbench `
   -B out\web-workbench
-tools\cmake\windows-x64\bin\cmake.exe `
+cmake `
   --build out\web-workbench
 ```
 

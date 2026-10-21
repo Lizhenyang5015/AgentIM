@@ -4,7 +4,7 @@
     {
       "label": "AgentIM: Configure macOS Debug",
       "type": "shell",
-      "command": "${workspaceFolder}/tools/cmake/macos-universal/bin/cmake",
+      "command": "cmake",
       "args": ["--preset", "macos-debug"],
       "problemMatcher": "$gcc",
       "group": "build"
@@ -12,7 +12,7 @@
     {
       "label": "AgentIM: Build macOS Debug",
       "type": "shell",
-      "command": "${workspaceFolder}/tools/cmake/macos-universal/bin/cmake",
+      "command": "cmake",
       "args": ["--build", "--preset", "macos-debug"],
       "problemMatcher": "$gcc",
       "group": "build",
@@ -21,14 +21,14 @@
     {
       "label": "AgentIM: Configure Windows Debug",
       "type": "shell",
-      "command": "${workspaceFolder}\\tools\\cmake\\windows-x64\\bin\\cmake.exe",
+      "command": "cmake",
       "args": ["--preset", "windows-debug"],
       "problemMatcher": "$msCompile"
     },
     {
       "label": "AgentIM: Build Windows Debug",
       "type": "shell",
-      "command": "${workspaceFolder}\\tools\\cmake\\windows-x64\\bin\\cmake.exe",
+      "command": "cmake",
       "args": ["--build", "--preset", "windows-debug"],
       "problemMatcher": "$msCompile",
       "dependsOn": "AgentIM: Configure Windows Debug"

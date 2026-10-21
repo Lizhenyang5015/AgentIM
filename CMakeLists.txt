@@ -1,17 +1,13 @@
 cmake_minimum_required(VERSION 3.25)
 
-# VS Code CMake Tools may invoke CMake with `-G Ninja` instead of a preset.
-# Resolve the project-maintained Ninja before `project()` enables languages.
+# Resolve the pinned project Ninja before `project()` enables languages. A
+# clean checkout downloads it automatically when the selected generator needs
+# it, so developers do not install or configure Ninja separately.
 if(CMAKE_GENERATOR STREQUAL "Ninja" AND NOT CMAKE_MAKE_PROGRAM)
-    if(APPLE)
-        set(_agentim_ninja "${CMAKE_SOURCE_DIR}/tools/ninja/macos-arm64/ninja")
-    elseif(WIN32)
-        set(_agentim_ninja "${CMAKE_SOURCE_DIR}/tools/ninja/windows-x64/ninja.exe")
-    endif()
-
-    if(DEFINED _agentim_ninja AND EXISTS "${_agentim_ninja}")
-        set(CMAKE_MAKE_PROGRAM "${_agentim_ninja}" CACHE FILEPATH
-            "AgentIM-maintained Ninja executable" FORCE)
+    option(AGENTIM_AUTO_FETCH_BUILD_TOOLS
+        "Restore missing pinned build tools during CMake configure" ON)
+    if(AGENTIM_AUTO_FETCH_BUILD_TOOLS)
+        include("${CMAKE_CURRENT_SOURCE_DIR}/tools/fetch_ninja.cmake")
     endif()
 endif()
 

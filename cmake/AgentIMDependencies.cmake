@@ -16,11 +16,25 @@ endif()
 
 set(AGENTIM_QT_ROOT "${_agentim_default_qt_root}" CACHE PATH
     "AgentIM-maintained Qt SDK root")
+option(AGENTIM_AUTO_FETCH_DEPENDENCIES
+    "Restore missing pinned binary SDKs during CMake configure" ON)
 
-if(NOT AGENTIM_QT_ROOT)
+if(AGENTIM_AUTO_FETCH_DEPENDENCIES
+   AND (NOT EXISTS "${AGENTIM_QT_ROOT}/lib/cmake/Qt6/Qt6Config.cmake"
+        OR NOT EXISTS "${AGENTIM_QT_ROOT}/lib/cmake/Qt6Widgets/Qt6WidgetsConfig.cmake"))
+    if(APPLE)
+        set(AGENTIM_QT_PLATFORM "macos-arm64")
+    elseif(WIN32)
+        set(AGENTIM_QT_PLATFORM "windows-x64")
+    endif()
+    include("${CMAKE_SOURCE_DIR}/tools/fetch_qt.cmake")
+endif()
+
+if(NOT EXISTS "${AGENTIM_QT_ROOT}/lib/cmake/Qt6/Qt6Config.cmake"
+   OR NOT EXISTS "${AGENTIM_QT_ROOT}/lib/cmake/Qt6Widgets/Qt6WidgetsConfig.cmake")
     message(FATAL_ERROR
-        "AGENTIM_QT_ROOT is not set. Provide the AgentIM-maintained Qt SDK root, "
-        "for example ${CMAKE_SOURCE_DIR}/third_party/qt/macos-arm64/6.10.3/macos.")
+        "The Qt SDK is missing or incomplete at ${AGENTIM_QT_ROOT}. "
+        "Enable AGENTIM_AUTO_FETCH_DEPENDENCIES or provide AGENTIM_QT_ROOT.")
 endif()
 
 list(PREPEND CMAKE_PREFIX_PATH "${AGENTIM_QT_ROOT}")
@@ -31,12 +45,22 @@ option(AGENTIM_ENABLE_CEF
     "Load the staged CEF SDK and build its official C++ wrapper" OFF)
 
 if(AGENTIM_ENABLE_CEF)
+    if(AGENTIM_AUTO_FETCH_DEPENDENCIES
+       AND (NOT EXISTS "${AGENTIM_CEF_ROOT}/cmake/FindCEF.cmake"
+            OR NOT EXISTS "${AGENTIM_CEF_ROOT}/include/cef_app.h"))
+        if(APPLE)
+            set(AGENTIM_CEF_PLATFORM "macos-arm64")
+        elseif(WIN32)
+            set(AGENTIM_CEF_PLATFORM "windows-x64")
+        endif()
+        include("${CMAKE_SOURCE_DIR}/tools/fetch_cef.cmake")
+    endif()
+
     if(NOT EXISTS "${AGENTIM_CEF_ROOT}/cmake/FindCEF.cmake"
        OR NOT EXISTS "${AGENTIM_CEF_ROOT}/include/cef_app.h")
         message(FATAL_ERROR
             "The CEF SDK is missing or incomplete at ${AGENTIM_CEF_ROOT}. "
-            "Stage it first with: ${CMAKE_COMMAND} -P "
-            "${CMAKE_SOURCE_DIR}/tools/fetch_cef.cmake")
+            "Enable AGENTIM_AUTO_FETCH_DEPENDENCIES or provide AGENTIM_CEF_ROOT.")
     endif()
 
     # The official CEF package ships its own FindCEF module and an unmodified

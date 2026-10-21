@@ -57,16 +57,17 @@ See `docs/coding-conventions.md` for the C++20 baseline, include order, and Qt o
 
 | Purpose | Command or location |
 |---|---|
-| macOS Debug configure | `tools/cmake/macos-universal/bin/cmake --preset macos-debug` |
-| macOS Debug build | `tools/cmake/macos-universal/bin/cmake --build --preset macos-debug` |
+| macOS Debug configure | `cmake --preset macos-debug` |
+| macOS Debug build | `cmake --build --preset macos-debug` |
 | Debug CMake workspace | `out/debug` |
 | Release CMake workspace | `out/release` |
 | Debug products | `build/debug/bin`, `build/debug/lib` |
 | Release products | `build/release/bin`, `build/release/lib` |
 | Application target | `agentim_desktop` |
 | Dependency root selection | `cmake/AgentIMDependencies.cmake` |
+| Clean-clone tool/dependency restoration | Automatic during configure (`AGENTIM_AUTO_FETCH_BUILD_TOOLS`, `AGENTIM_AUTO_FETCH_DEPENDENCIES`) |
 | Qt SDK CMake root | `AGENTIM_QT_ROOT` |
-| CEF SDK bootstrap | `tools/cmake/macos-universal/bin/cmake -P tools/fetch_cef.cmake` |
+| Tool/SDK maintenance scripts | `tools/fetch_ninja.cmake`, `tools/fetch_qt.cmake`, `tools/fetch_cef.cmake` |
 | CEF SDK CMake switch | `AGENTIM_ENABLE_CEF` (enabled by shared presets) |
 | CEF platform/version manifest | `third_party/manifests/cef.json` |
 | CEF consumer target | `AgentIM::CEF` |
@@ -80,9 +81,11 @@ See `docs/coding-conventions.md` for the C++20 baseline, include order, and Qt o
 
 Third-party paths and discovery belong in `cmake/AgentIMDependencies.cmake`.
 Modules declare only the targets they use through `target_link_libraries()`;
-do not link every dependency globally. CEF is pinned to the official minimal
-binary SDK and exposed to future CEF consumers as `AgentIM::CEF`. The SDKs for
-macOS ARM64 and Windows x64 are staged in the maintained dependency tree. The
+do not link every dependency globally. Missing Qt Base and CEF SDKs are restored
+and checksum-verified automatically during a normal configure; no separate
+developer bootstrap step is part of the clean-clone workflow. CEF is pinned to
+the official minimal binary SDK and exposed to future CEF consumers as
+`AgentIM::CEF`. The SDKs are staged in the maintained dependency tree. The
 macOS wrapper build, complete helper bundle set, runtime staging, custom Web
 resource scheme, manifest-driven application registry, Qt browser container,
 and independent Workbench package target have been verified. Native staging
