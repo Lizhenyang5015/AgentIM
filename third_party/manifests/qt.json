@@ -1,0 +1,21 @@
+{
+  "name": "qt-base",
+  "version": "6.10.3",
+  "distribution": "prebuilt-binary-sdk",
+  "required_modules": ["Core", "Gui", "Widgets"],
+  "transitive_runtime_modules": ["DBus"],
+  "platforms": {
+    "macos-arm64": {
+      "root": "third_party/qt/macos-arm64/6.10.3/macos",
+      "required_paths": ["include", "lib", "plugins"]
+    },
+    "windows-x64": {
+      "root": "third_party/qt/windows-x64/6.10.3/msvc2022_64",
+      "required_paths": ["include", "lib", "plugins"]
+    }
+  },
+  "runtime": {
+    "package_with_application": true,
+    "notes": "Bundle Qt frameworks/DLLs and platform plugins with the final application."
+  }
+}

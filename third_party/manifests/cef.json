@@ -1,0 +1,40 @@
+{
+  "name": "chromium-embedded-framework",
+  "version": "154.0.34+g14c5a08+chromium-154.0.8037.98",
+  "channel": "stable",
+  "distribution": "official-minimal-binary-sdk",
+  "source": "https://cef-builds.spotifycdn.com/index.html",
+  "integrity": {
+    "algorithm": "SHA1",
+    "macos-arm64": "b7081f6609e5edccf07be96b5d7977329fbe1bdf",
+    "windows-x64": "be54bbaf3222191dec59ffd9c9ec7e8a7f44a26d",
+    "source": "versioned sidecar checksum from the official distribution host",
+    "enforced_by": "tools/fetch_cef.cmake"
+  },
+  "license": {
+    "name": "BSD-3-Clause and bundled third-party notices",
+    "files": ["LICENSE.txt", "LICENSES.chromium.html"]
+  },
+  "platforms": {
+    "macos-arm64": {
+      "archive_platform": "macosarm64",
+      "root": "third_party/cef/macos-arm64/154.0.34+g14c5a08+chromium-154.0.8037.98/sdk",
+      "archive": "third_party/cef/macos-arm64/154.0.34+g14c5a08+chromium-154.0.8037.98/cef_binary_154.0.34+g14c5a08+chromium-154.0.8037.98_macosarm64_minimal.tar.bz2",
+      "required_paths": ["include", "cmake", "Release/Chromium Embedded Framework.framework"]
+    },
+    "windows-x64": {
+      "archive_platform": "windows64",
+      "root": "third_party/cef/windows-x64/154.0.34+g14c5a08+chromium-154.0.8037.98/sdk",
+      "archive": "third_party/cef/windows-x64/154.0.34+g14c5a08+chromium-154.0.8037.98/cef_binary_154.0.34+g14c5a08+chromium-154.0.8037.98_windows64_minimal.tar.bz2",
+      "required_paths": ["include", "cmake", "Release/libcef.dll", "Release/libcef.lib", "Resources"]
+    }
+  },
+  "wrapper": {
+    "path": "libcef_dll",
+    "policy": "Build the unmodified official C++ wrapper as part of AgentIM; do not modify vendor sources."
+  },
+  "runtime": {
+    "package_with_application": true,
+    "notes": "Bundle the CEF framework or DLLs, resources, locales, and helper processes required by the target platform."
+  }
+}

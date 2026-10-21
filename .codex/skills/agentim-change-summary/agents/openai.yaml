@@ -1,0 +1,4 @@
+interface:
+  display_name: "AgentIM Personal Workflow"
+  short_description: "Apply personal workflow and project document routing"
+  default_prompt: "Use $agentim-change-summary while updating this AgentIM project."

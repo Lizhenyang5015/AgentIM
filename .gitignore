@@ -1,0 +1,36 @@
+# Build products
+/build/
+/out/
+/dist/
+
+# Local dependency SDK payloads. Keep third_party/README.md and manifests.
+/third_party/qt/
+/third_party/cef/
+/third_party/build/
+/third_party/install/
+/third_party/downloads/
+
+# Local build-tool distributions. Keep bootstrap scripts and tools/README.md.
+/tools/cmake/
+/tools/ninja/
+/tools/downloads/
+
+# Local dependency and package-manager output
+node_modules/
+.cache/
+*.log
+
+# User-specific CMake configuration
+/CMakeUserPresets.json
+
+# Generated compiler database
+/compile_commands.json
+
+# Editors and operating systems
+.vscode/ipch/
+.vscode/.browse.VC.db*
+.idea/
+.vs/
+*.swp
+*.swo
+.DS_Store

@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "AgentIM: Debug on macOS",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/debug/bin/agentim_desktop.app/Contents/MacOS/agentim_desktop",
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "AgentIM: Build macOS Debug",
+      "env": {
+        "QT_PLUGIN_PATH": "${workspaceFolder}/third_party/qt/macos-arm64/6.10.3/macos/plugins"
+      }
+    },
+    {
+      "name": "AgentIM: Debug on Windows",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}\\build\\debug\\bin\\agentim_desktop.exe",
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "AgentIM: Build Windows Debug",
+      "stopAtEntry": false
+    }
+  ]
+}

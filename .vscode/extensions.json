@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "openai.chatgpt",
+    "ms-vscode.cmake-tools",
+    "ms-vscode.cpptools",
+    "llvm-vs-code-extensions.vscode-clangd",
+    "vadimcn.vscode-lldb",
+    "xaver.clang-format",
+    "twxs.cmake"
+  ]
+}

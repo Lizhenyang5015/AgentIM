@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self'; script-src 'self'; connect-src 'self'"
+    />
+    <meta name="description" content="AgentIM main conversation" />
+    <title>AgentIM</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="conversation-page">
+      <section class="empty-state" id="empty-state">
+        <h1 data-i18n="welcomeTitle"></h1>
+      </section>
+
+      <section
+        class="conversation-messages"
+        id="messages"
+        data-i18n-aria-label="messageListLabel"
+        aria-live="polite"
+      ></section>
+
+      <form class="composer" id="composer">
+        <div class="composer__surface">
+          <textarea
+            id="prompt-input"
+            rows="1"
+            data-i18n-aria-label="composerLabel"
+          ></textarea>
+
+          <button
+            class="composer__send"
+            type="submit"
+            data-i18n="sendAction"
+            data-i18n-aria-label="sendLabel"
+            disabled
+          ></button>
+        </div>
+      </form>
+    </main>
+
+    <template id="message-template">
+      <article class="message">
+        <div class="message__avatar" aria-hidden="true"></div>
+        <div class="message__content">
+          <p class="message__author"></p>
+          <div class="message__body"></div>
+        </div>
+      </article>
+    </template>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

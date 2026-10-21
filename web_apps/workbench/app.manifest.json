@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "appId": "workbench",
+  "displayName": "AgentIM Workbench",
+  "version": "0.1.0",
+  "entryPoint": "index.html",
+  "runtime": "cef",
+  "capabilities": []
+}
