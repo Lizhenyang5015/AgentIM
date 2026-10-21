@@ -6,6 +6,9 @@
     "llvm-vs-code-extensions.vscode-clangd",
     "vadimcn.vscode-lldb",
     "xaver.clang-format",
-    "twxs.cmake"
+    "twxs.cmake",
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+    "github.vscode-pull-request-github"
   ]
 }
