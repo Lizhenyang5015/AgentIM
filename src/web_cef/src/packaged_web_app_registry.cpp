@@ -69,8 +69,9 @@ bool isFileInsideApplication(
     const PackagedWebApplication& application,
     const QFileInfo& file) {
     const QString canonical_file = file.canonicalFilePath();
+    // Qt canonical paths use '/' on every platform, including Windows.
     const QString canonical_root_prefix =
-        application.canonical_root + QDir::separator();
+        application.canonical_root + QStringLiteral("/");
     return !application.canonical_root.isEmpty() &&
            !canonical_file.isEmpty() &&
            canonical_file.startsWith(canonical_root_prefix) && file.isFile();

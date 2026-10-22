@@ -11,7 +11,7 @@ This file is the maintained navigation index for AgentIM. It records project con
 | Build, output, installation, and debugging | `docs/build-and-debug.md` | Changing or using CMake, build, install, or debugger workflows |
 | Figma design integration | `docs/design-integration.md` | Using or changing the design-to-code integration |
 | Third-party SDK layout and acquisition | `third_party/README.md` | Adding, restoring, or upgrading a dependency SDK |
-| CEF module boundary and bridge | `src/web_cef/README.md` | Implementing browser lifecycle, embedding, or Web/native communication |
+| CEF module boundary, browser embedding, and bridge | `src/web_cef/README.md` | Implementing browser lifecycle, embedding, DPI sizing, or Web/native communication |
 | Local Web workbench | `web_apps/workbench/README.md` | Developing or packaging the independently maintained local Web application |
 | Platform runtime integration | `platform/macos/README.md`, `platform/windows/README.md` | Adding helper processes, native integration, or release staging |
 | Build, dependency, test, and packaging contracts | This document | Changing project-wide contracts or validating delivery requirements |
@@ -59,6 +59,10 @@ See `docs/coding-conventions.md` for the C++20 baseline, include order, and Qt o
 |---|---|
 | macOS Debug configure | `cmake --preset macos-debug` |
 | macOS Debug build | `cmake --build --preset macos-debug` |
+| Windows Debug configure | `cmake --preset windows-debug` (x64 MSVC developer shell) |
+| Windows Debug build | `cmake --build --preset windows-debug` |
+| Windows Debug launch | `build/debug/bin/agentim_desktop.exe` |
+| Windows compiler output language | English C++ language resources; Windows presets set `VSLANG=1033` for Ninja dependency parsing |
 | Debug CMake workspace | `out/debug` |
 | Release CMake workspace | `out/release` |
 | Debug products | `build/debug/bin`, `build/debug/lib` |
@@ -67,10 +71,12 @@ See `docs/coding-conventions.md` for the C++20 baseline, include order, and Qt o
 | Dependency root selection | `cmake/AgentIMDependencies.cmake` |
 | Clean-clone tool/dependency restoration | Automatic during configure (`AGENTIM_AUTO_FETCH_BUILD_TOOLS`, `AGENTIM_AUTO_FETCH_DEPENDENCIES`) |
 | Qt SDK CMake root | `AGENTIM_QT_ROOT` |
+| Windows build-tree Qt runtime | Project SDK `windeployqt.exe` and `qtpaths.exe`, invoked after linking in `src/app/CMakeLists.txt` |
 | Tool/SDK maintenance scripts | `tools/fetch_ninja.cmake`, `tools/fetch_qt.cmake`, `tools/fetch_cef.cmake` |
 | CEF SDK CMake switch | `AGENTIM_ENABLE_CEF` (enabled by shared presets) |
 | CEF platform/version manifest | `third_party/manifests/cef.json` |
 | CEF consumer target | `AgentIM::CEF` |
+| Windows CEF integration | `cmake/AgentIMDependencies.cmake`; toolchain and runtime contract in `docs/build-and-debug.md` |
 | Web app discovery | `web_apps/CMakeLists.txt` |
 | Local Web app definition | `web_apps/workbench/CMakeLists.txt`, `web_apps/workbench/app.manifest.json` |
 | Local Web app build target | `agentim_web_workbench` |
@@ -91,8 +97,10 @@ resource scheme, manifest-driven application registry, Qt browser container,
 and independent Workbench package target have been verified. Native staging
 discovers registered Web application targets, consumes each `dist` artifact,
 and never reads a Web source directory at runtime. C++ selects an application
-by stable `appId`; the package manifest owns its entry point. Windows
-compilation must be verified on a Windows host with the MSVC toolchain.
+by stable `appId`; the package manifest owns its entry point. Windows x64 Debug
+configuration, MSVC wrapper/application compilation, Qt/CEF runtime staging,
+and launch with visible Workbench content have also been verified. The exact
+Windows toolchain and validation scope are recorded in `docs/build-and-debug.md`.
 
 ## Test contract
 
@@ -111,11 +119,13 @@ Until then, every code change must at minimum build the affected Debug preset. U
 
 The local macOS build stages the CEF framework, resources, base, Alerts, GPU,
 Plugin, and Renderer helper bundles, and the local Web application inside the
-application bundle. Release-grade Qt/CEF deployment verification, code signing,
-notarization, installer generation, and the equivalent Windows runtime
-validation remain pending. Any change that introduces them must document the
-exact staging, signing, and verification commands in `docs/build-and-debug.md`
-and this index.
+application bundle. The Windows Debug build stages Qt/CEF DLLs, platform
+plugins, resources, and the local Web application beside the executable, and
+its launch is verified. Release builds, installation staging, release-grade
+Qt/CEF deployment, enabled CEF sandbox verification, code signing, notarization,
+and installer generation remain pending. Any change that introduces them must
+document the exact staging, signing, and verification commands in
+`docs/build-and-debug.md` and this index.
 
 ## Index maintenance triggers
 

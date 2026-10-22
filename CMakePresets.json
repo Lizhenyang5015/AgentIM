@@ -33,13 +33,19 @@
       "name": "windows-debug",
       "displayName": "Windows Debug",
       "inherits": "base",
-      "binaryDir": "${sourceDir}/out/debug"
+      "binaryDir": "${sourceDir}/out/debug",
+      "environment": {
+        "VSLANG": "1033"
+      }
     },
     {
       "name": "windows-release",
       "displayName": "Windows Release",
       "inherits": "base",
       "binaryDir": "${sourceDir}/out/release",
+      "environment": {
+        "VSLANG": "1033"
+      },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
       }

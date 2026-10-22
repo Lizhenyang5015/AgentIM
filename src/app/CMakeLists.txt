@@ -11,8 +11,21 @@ set_target_properties(agentim_desktop PROPERTIES
     MACOSX_BUNDLE TRUE
 )
 
+if(WIN32)
+    add_custom_command(TARGET agentim_desktop POST_BUILD
+        COMMAND "${AGENTIM_WINDEPLOYQT_EXECUTABLE}"
+            --qtpaths "${AGENTIM_QTPATHS_EXECUTABLE}"
+            "$<IF:$<CONFIG:Debug>,--debug,--release>"
+            --no-translations
+            --dir "$<TARGET_FILE_DIR:agentim_desktop>"
+            "$<TARGET_FILE:agentim_desktop>"
+        COMMENT "Staging the Qt Windows runtime"
+        VERBATIM
+    )
+endif()
+
 # `cmake --install` produces the staging directory consumed by the platform
-# packaging step. Qt runtime deployment is added here after Qt is built.
+# packaging step. Build-tree runtime staging is separate from release packaging.
 install(TARGETS agentim_desktop
     BUNDLE DESTINATION .
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

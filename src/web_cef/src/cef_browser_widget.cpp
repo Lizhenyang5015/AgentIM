@@ -6,11 +6,13 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QElapsedTimer>
+#include <QEvent>
 #include <QEventLoop>
 #include <QFocusEvent>
 #include <QMoveEvent>
 #include <QResizeEvent>
 #include <QShowEvent>
+#include <QSize>
 #include <QThread>
 #include <QTimer>
 
@@ -36,6 +38,21 @@ void resizeMacBrowserView(void* view_handle, int width, int height);
 namespace {
 
 constexpr int kBrowserShutdownTimeoutMs = 3000;
+
+QSize browserViewportSize(QWidget* owner) {
+#if defined(Q_OS_WIN)
+    // Win32 child windows use native pixels, while Qt widget sizes use DIPs.
+    const auto window = reinterpret_cast<HWND>(
+        static_cast<std::uintptr_t>(owner->winId()));
+    RECT client_rect{};
+    if (GetClientRect(window, &client_rect)) {
+        return QSize(
+            client_rect.right - client_rect.left,
+            client_rect.bottom - client_rect.top);
+    }
+#endif
+    return owner->size();
+}
 
 class CefBrowserClient final : public CefClient,
                                public CefLifeSpanHandler,
@@ -141,11 +158,12 @@ public:
 
         const auto native_window = reinterpret_cast<CefWindowHandle>(
             static_cast<std::uintptr_t>(owner_->winId()));
+        const QSize viewport_size = browserViewportSize(owner_);
 
         CefWindowInfo window_info;
         window_info.SetAsChild(
             native_window,
-            CefRect(0, 0, owner_->width(), owner_->height()));
+            CefRect(0, 0, viewport_size.width(), viewport_size.height()));
         window_info.runtime_style = CEF_RUNTIME_STYLE_ALLOY;
 
         CefBrowserSettings browser_settings;
@@ -166,7 +184,9 @@ public:
     }
 
     void resizeBrowser() const {
-        resizeNativeBrowser(client_->browser(), owner_->width(), owner_->height());
+        const QSize viewport_size = browserViewportSize(owner_);
+        resizeNativeBrowser(
+            client_->browser(), viewport_size.width(), viewport_size.height());
     }
 
     void notifyMoveOrResize() const {
@@ -215,6 +235,18 @@ CefBrowserWidget::CefBrowserWidget(const QUrl& initial_url, QWidget* parent)
 
 CefBrowserWidget::~CefBrowserWidget() {
     impl_->closeBrowser();
+}
+
+bool CefBrowserWidget::event(QEvent* event) {
+    const bool handled = QWidget::event(event);
+#if defined(Q_OS_WIN)
+    if (event->type() == QEvent::DevicePixelRatioChange) {
+        QTimer::singleShot(0, this, [this] {
+            impl_->resizeBrowser();
+        });
+    }
+#endif
+    return handled;
 }
 
 void CefBrowserWidget::focusInEvent(QFocusEvent* event) {

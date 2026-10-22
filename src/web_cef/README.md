@@ -8,6 +8,22 @@ The pinned macOS ARM64 and Windows x64 minimal SDKs are staged. Shared CMake
 presets validate the selected SDK, compile the unmodified official
 `libcef_dll_wrapper`, and expose `AgentIM::CEF`.
 
+Windows uses the main executable for CEF subprocess entry. The Windows CEF
+import-library, MSVC runtime, stack, and development sandbox integration is
+documented in `docs/build-and-debug.md`. Its compilation and launch are
+verified for Windows x64 Debug on an MSVC host, including runtime staging and
+visible embedded Workbench content. Release builds, installation packaging,
+signing, and an enabled sandbox remain unverified.
+
+On Windows, browser creation and resizing use the native host HWND's client
+rectangle in physical pixels. After Qt processes a device-pixel-ratio change,
+the container schedules another browser resize, including when the logical
+widget size stays unchanged while moving between displays. This viewport
+contract is implemented in `src/cef_browser_widget.cpp`; the high-DPI sizing
+change has been rebuilt and manually verified on the current high-DPI display
+at startup and after maximizing the window. Moving between displays with
+different scaling has not been verified.
+
 The module currently provides CEF process initialization, the complete macOS
 helper bundle set required by CEF's process model, a Qt-hosted browser widget,
 development runtime staging, and a custom packaged-resource scheme for the

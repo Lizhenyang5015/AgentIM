@@ -5,6 +5,7 @@
 #include <QUrl>
 #include <QWidget>
 
+class QEvent;
 class QFocusEvent;
 class QMoveEvent;
 class QResizeEvent;
@@ -21,6 +22,7 @@ public:
     CefBrowserWidget& operator=(const CefBrowserWidget&) = delete;
 
 protected:
+    bool event(QEvent* event) override;
     void focusInEvent(QFocusEvent* event) override;
     void moveEvent(QMoveEvent* event) override;
     void resizeEvent(QResizeEvent* event) override;

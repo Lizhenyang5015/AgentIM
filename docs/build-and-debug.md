@@ -43,6 +43,62 @@ reuse the local tools, SDKs, and download cache. No global Ninja/Qt/CEF
 installation or separate bootstrap command is required. A C++ compiler and
 CMake 3.25+ are host prerequisites.
 
+## Windows development flow
+
+Install CMake 3.25+ and Visual Studio Build Tools with the **Desktop development
+with C++** workload, a Windows SDK, and English (en-US) language resources for
+the C++ toolchain. Windows presets set `VSLANG=1033` so MSVC's `/showIncludes`
+output stays in English for Ninja's header-dependency parsing. Open an **x64
+Native Tools Command Prompt** or **Developer PowerShell for VS**, then run from
+the repository root:
+
+```powershell
+cmake --preset windows-debug
+cmake --build --preset windows-debug
+.\build\debug\bin\agentim_desktop.exe
+```
+
+If using the optional project-local CMake, replace `cmake` in these commands
+with `.\tools\cmake\windows-x64\bin\cmake.exe`. The tool layout is documented
+in `tools/README.md`.
+
+The first configure restores the same pinned dependencies as the macOS flow.
+After linking, the Windows build runs `windeployqt.exe` from `AGENTIM_QT_ROOT`,
+with that SDK's explicit `qtpaths.exe`, to stage the matching Debug or Release
+Qt DLLs and plugins beside the application. No global Qt path or separate
+manual deployment command is required. CEF DLLs, resources, and locales are
+staged separately, together with the packaged Web workbench.
+
+The Windows CEF minimal SDK supplies only Release binaries. Both Debug and
+Release application builds therefore link `Release/libcef.lib`; the official
+C++ wrapper is compiled locally with `/MDd` for Debug and `/MD` for Release to
+match Qt's shared MSVC runtime. CEF's wrapper-specific flag setup is kept in
+its subdirectory, and the normal CMake C++ flags are restored for Qt and the
+application. `AgentIM::CEF` also supplies `NOMINMAX`, `WIN32_LEAN_AND_MEAN`,
+and an 8 MiB main-thread stack.
+
+Development builds set CEF's `USE_SANDBOX=OFF`, matching the existing runtime
+`no_sandbox` setting. Release packaging must establish and verify its sandbox
+policy before distribution. These integration settings are maintained in
+`cmake/AgentIMDependencies.cmake`; vendor SDK sources remain unmodified.
+
+Windows x64 Debug configuration, wrapper/application compilation, automatic
+Qt/CEF runtime staging, and launch are verified with MSVC 19.44.35229 (Visual
+Studio Build Tools 17.14.42) and Windows SDK 10.0.26100.0. Manual inspection
+confirmed the Qt main window and embedded Workbench content are visible.
+After installing English C++ resources, a fresh configuration and clean build
+produced valid Ninja header dependencies, and a subsequent build performed no
+C++ recompilation; Workbench resource staging still runs.
+
+The high-DPI viewport sizing change has been rebuilt and manually verified on
+the current scaled display: Workbench fills its Qt host at startup and resizes
+correctly after maximizing the window, with the input area fully visible.
+Moving between displays with different scaling has not been checked. The
+viewport sizing contract is maintained in `src/web_cef/README.md`.
+
+Release builds, `cmake --install`, signing, installer production, and an enabled
+CEF sandbox have not been verified.
+
 ## Dependency bootstrap
 
 Missing Ninja, Qt, and CEF packages are downloaded during normal project
@@ -125,9 +181,7 @@ npm run serve
 This preview is for Web-only iteration. The bundled path and CEF integration
 must still be validated by building and launching `agentim_desktop`.
 
-The macOS ARM64 configure and Debug build are verified. The Windows SDK archive
-and binary architecture are verified, but its wrapper build must run on a
-Windows host with MSVC before Windows integration is considered complete.
+The macOS ARM64 configure and Debug build are verified.
 
 The local macOS Debug bundle contains the CEF framework, CEF resources and
 locales, the complete helper application set, and the local workbench. Release

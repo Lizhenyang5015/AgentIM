@@ -39,6 +39,23 @@ endif()
 
 list(PREPEND CMAKE_PREFIX_PATH "${AGENTIM_QT_ROOT}")
 
+if(WIN32)
+    # Use the same SDK for compilation and runtime deployment. Explicit tool
+    # paths avoid accidentally deploying an unrelated Qt installation on PATH.
+    set(AGENTIM_WINDEPLOYQT_EXECUTABLE
+        "${AGENTIM_QT_ROOT}/bin/windeployqt.exe")
+    set(AGENTIM_QTPATHS_EXECUTABLE
+        "${AGENTIM_QT_ROOT}/bin/qtpaths.exe")
+    foreach(_agentim_qt_tool IN ITEMS
+            AGENTIM_WINDEPLOYQT_EXECUTABLE AGENTIM_QTPATHS_EXECUTABLE)
+        if(NOT EXISTS "${${_agentim_qt_tool}}")
+            message(FATAL_ERROR
+                "The Qt SDK is missing a Windows deployment tool: "
+                "${${_agentim_qt_tool}}")
+        endif()
+    endforeach()
+endif()
+
 set(AGENTIM_CEF_ROOT "${_agentim_default_cef_root}" CACHE PATH
     "AgentIM-maintained CEF minimal binary SDK root")
 option(AGENTIM_ENABLE_CEF
@@ -70,6 +87,15 @@ if(AGENTIM_ENABLE_CEF)
 
     if(APPLE)
         set(PROJECT_ARCH "arm64")
+    elseif(WIN32)
+        # Match Qt's shared MSVC runtime. The development executable already
+        # disables the CEF sandbox and does not use CEF's bootstrap DLL model.
+        set(CEF_RUNTIME_LIBRARY_FLAG "/MD")
+        set(USE_SANDBOX OFF)
+        foreach(_agentim_cxx_flags IN ITEMS
+                CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE)
+            set(_agentim_saved_${_agentim_cxx_flags} "${${_agentim_cxx_flags}}")
+        endforeach()
     endif()
 
     find_package(CEF REQUIRED)
@@ -79,6 +105,15 @@ if(AGENTIM_ENABLE_CEF)
             "${CEF_LIBCEF_DLL_WRAPPER_PATH}"
             "${CMAKE_BINARY_DIR}/third_party/cef/libcef_dll_wrapper"
         )
+    endif()
+
+    if(WIN32)
+        # CEF clears these defaults for its Ninja wrapper build. Keep that
+        # change in the vendor subdirectory and retain normal flags for Qt.
+        foreach(_agentim_cxx_flags IN ITEMS
+                CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE)
+            set(${_agentim_cxx_flags} "${_agentim_saved_${_agentim_cxx_flags}}")
+        endforeach()
     endif()
 
     add_library(agentim_cef_sdk INTERFACE)
@@ -92,6 +127,13 @@ if(AGENTIM_ENABLE_CEF)
     # macOS loads the bundled framework dynamically as required by the CEF
     # sandbox. Windows links the import library and loads libcef.dll at runtime.
     if(NOT APPLE)
+        # The minimal SDK ships only Release binaries; its import library is
+        # also used by Debug clients and the locally compiled Debug wrapper.
+        ADD_LOGICAL_TARGET(libcef_lib "${CEF_LIB_RELEASE}" "${CEF_LIB_RELEASE}")
         target_link_libraries(agentim_cef_sdk INTERFACE libcef_lib)
+        target_compile_definitions(agentim_cef_sdk INTERFACE
+            NOMINMAX WIN32_LEAN_AND_MEAN)
+        # CEF's 64-bit main thread needs more than Windows' default 1 MiB stack.
+        target_link_options(agentim_cef_sdk INTERFACE /STACK:0x800000)
     endif()
 endif()
